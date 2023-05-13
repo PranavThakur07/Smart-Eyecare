@@ -1,5 +1,6 @@
 from tkinter import Tk, Canvas, PhotoImage, Entry, END, Button
 from win32api import GetTickCount, GetLastInputInfo
+
 import time
 import threading
 from win10toast import ToastNotifier
@@ -8,6 +9,32 @@ import pystray
 from PIL import Image
 import sys
 import datetime
+from google.cloud import storage
+import os
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "C:/service account key/numeric-wind-386304-f7e3a7a3ddee.json"
+
+fileNames = ['firstBackground.png', 'image0.png', 'image1.png', 'image2.png',
+             'imageOfTextBox.png', 'logo.ico', 'secondBackground.png', 'standByBackground.png']
+# Create a client instance
+client = storage.Client()
+
+# Get a reference to the bucket
+bucket = client.bucket('smart_viscare')
+
+# List files in the bucket
+blobs = bucket.list_blobs()
+
+cloudFiles = list()
+for blob in blobs:
+    cloudFiles.append(blob.name)
+
+j = 0
+if not os.path.exists('logo.ico'):
+    for f in cloudFiles[1:]:
+        print(f)
+        blob = bucket.blob(f)
+        blob.download_to_filename(fileNames[j])
+        j = j+1
 
 
 def threadAtTheBackground():
